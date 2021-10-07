@@ -92,7 +92,7 @@ class Graph():
         `v`, next vertex to be visited
         `colour`, dictionary with the colour of each node
         """
-        print('Visiting: ', v)
+        # print('Visiting: ', v)
         self.colour[v] = 'grey' # Visited vertices are coloured 'grey'
         for w in self.adj_list[v]: # Let's visit all outgoing edges from v
             if self.colour[w] == 'white': # To avoid loops, we vist check if the next vertex hasn't been visited yet
@@ -129,7 +129,7 @@ class Graph():
         return:
             True if cycle is found. Otherwise, False
         """      
-        print('Visiting: ', v)
+        # print('Visiting: ', v)
         self.colour[v] = 'grey'
         for w in self.adj_list[v]:
             if self.colour[w] == 'white':
@@ -137,7 +137,7 @@ class Graph():
                     return True
             else:
                 if self.colour[w] == 'grey':
-                    print(v, w, 'Cycle detected')
+                    # print(v, w, 'Cycle detected')
                     return True
         self.colour[v] = 'black'
         return False
