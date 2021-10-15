@@ -130,24 +130,24 @@ class Factor:
                 f.outcomeSpace[var] = (value,)
         return f
 
-    def evidence(self, **kwargs):
-        '''
-        Usage:  f.evidence(A='true', B='sunny'), where 'A' and 'B' are variable
-                names, and 'true' and 'sunny' are the observed outcomes.
+    # def evidence(self, **kwargs):
+    #     '''
+    #     Usage:  f.evidence(A='true', B='sunny'), where 'A' and 'B' are variable
+    #             names, and 'true' and 'sunny' are the observed outcomes.
         
-        Sets evidence by modifying the outcomeSpace
-        This function must be used to set evidence on all factors before joining,
-        because it removes the relevant variable from the factor. 
+    #     Sets evidence by modifying the outcomeSpace
+    #     This function must be used to set evidence on all factors before joining,
+    #     because it removes the relevant variable from the factor. 
         
-        Usage: fac.evidence(A='true',B='false')
-        This returns a factor which has set the variable 'A' to 'true' and 'B' to 'false'.
-        '''
-        f = self.copy()
-        evi = kwargs
-        indicies = tuple(self.outcomeSpace[v].index(evi[v]) if v in evi else slice(None) for v in self.domain)
-        f.table = f.table[indicies]
-        f.domain = tuple(v for v in f.domain if v not in evi)
-        return f
+    #     Usage: fac.evidence(A='true',B='false')
+    #     This returns a factor which has set the variable 'A' to 'true' and 'B' to 'false'.
+    #     '''
+    #     f = self.copy()
+    #     evi = kwargs
+    #     indicies = tuple(self.outcomeSpace[v].index(evi[v]) if v in evi else slice(None) for v in self.domain)
+    #     f.table = f.table[indicies]
+    #     f.domain = tuple(v for v in f.domain if v not in evi)
+    #     return f
     
     def marginalize(self, var):
         '''
