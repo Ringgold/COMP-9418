@@ -105,7 +105,7 @@ class Factor:
         '''
         Usage:  f.evidence(A='true', B='sunny'), where 'A' and 'B' are variable
                 names, and 'true' and 'sunny' are the observed outcomes.
-        
+
         Sets evidence by modifying the outcomeSpace
         This function must be used to set evidence on all factors before joining,
         because it removes the relevant variable from the factor. 
@@ -117,37 +117,18 @@ class Factor:
         evidence_dict = kwargs
         for var, value in evidence_dict.items():
             if var in f.domain:
-                
+
                 # find the row index that corresponds to var = value
                 index = f.outcomeSpace[var].index(value)
-                
+
                 # find the `var` axis and select only the row that corresponds to `value`
                 # on all other axes, select every row
                 slice_tuple = tuple(slice(index,index+1) if v == var else slice(None) for v in f.domain)
                 f.table = f.table[slice_tuple]
-                
+
                 # modify the outcomeSpace to correspond to the changes just made to self.table
                 f.outcomeSpace[var] = (value,)
         return f
-
-    # def evidence(self, **kwargs):
-    #     '''
-    #     Usage:  f.evidence(A='true', B='sunny'), where 'A' and 'B' are variable
-    #             names, and 'true' and 'sunny' are the observed outcomes.
-        
-    #     Sets evidence by modifying the outcomeSpace
-    #     This function must be used to set evidence on all factors before joining,
-    #     because it removes the relevant variable from the factor. 
-        
-    #     Usage: fac.evidence(A='true',B='false')
-    #     This returns a factor which has set the variable 'A' to 'true' and 'B' to 'false'.
-    #     '''
-    #     f = self.copy()
-    #     evi = kwargs
-    #     indicies = tuple(self.outcomeSpace[v].index(evi[v]) if v in evi else slice(None) for v in self.domain)
-    #     f.table = f.table[indicies]
-    #     f.domain = tuple(v for v in f.domain if v not in evi)
-    #     return f
     
     def marginalize(self, var):
         '''
