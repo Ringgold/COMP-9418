@@ -34,7 +34,9 @@ import ast
 import re
 import pickle
 import json
-from get_trans_matrix import outcomeSpace
+
+# Require the output graph used in transition matrix file
+from get_trans_matrix import output_graph
 
 ###################################
 # Code stub
@@ -56,28 +58,25 @@ state = np.array(state)
 index_r = {}
 index_l = {}
 start = 0
-for key in outcomeSpace.keys():
+for key in output_graph.keys():
     index_r[key] = start
     if start < 35:
         index_l['lights' + str(start + 1)] = start
     start += 1
 
-params = pd.read_csv('tran_matrix.csv')
-
-# Initialize tran_matrix
+tran_matrix_data = pd.read_csv('tran_matrix.csv')
 tran_matrix = {}
-tran_matrix['s1'] = []
-tran_matrix['s2'] = []
+tran_matrix['t1'] = []
+tran_matrix['t2'] = []
 
-for r in params:
-    if r[-2:] == 's1':
-        tran_matrix['s1'].append(list(params[r]))
-    elif r[-2:] == 's2':
-        tran_matrix['s2'].append(list(params[r]))
+for line in tran_matrix_data:
+    if line[-2:] == 't1':
+        tran_matrix['t1'].append(list(tran_matrix_data[line]))
+    elif line[-2:] == 't2':
+        tran_matrix['t2'].append(list(tran_matrix_data[line]))
 
 for l in tran_matrix.keys():
     tran_matrix[l] = np.array(tran_matrix[l])
-
 
 def get_action(sensor_data):
     # declare state as a global variable so it can be read and modified within this function
@@ -87,13 +86,12 @@ def get_action(sensor_data):
     global index_l
     global th
 
-    # different time use different transition matrix
     if int(sensor_data['time'].hour) < 17:
-        state = state @ tran_matrix['s1']
+        state = state @ tran_matrix['t1']
     elif int(sensor_data['time'].hour) == 17 and int(sensor_data['time'].minute) < 30:
-        state = state @ tran_matrix['s1']
+        state = state @ tran_matrix['t1']
     else:
-        state = state @ tran_matrix['s2']
+        state = state @ tran_matrix['t2']
 
     # adjustment for values of reliable sensors
     sensor_list = [["reliable_sensor1", "r16", 0.963, 0.009],
