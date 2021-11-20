@@ -49,17 +49,6 @@ output_graph = {'r1': ['r2', 'r3', 'r4', 'r7'],
                 'outside': ['r12', 'r22']
                 }
 
-def get_out_probability_for_room(data, room):
-    d = list(data[room])
-    change_sum = 0
-    if sum(d) == 0:
-        return 0
-    for i in range(len(d) - 1):
-        change = int(d[i]) - int(d[i + 1])
-        if change > 0:
-            change_sum += change
-    return change_sum / sum(d)
-
 if __name__ == "__main__":
     index = {}
     start = 0
@@ -105,8 +94,21 @@ if __name__ == "__main__":
             if sum(key_data) != 0:
                 room_in_out_info = [x/sum(key_data) for x in room_in_out_info]
             
+            # get out_probability_for_room
+            data_by_key = list(data_partial[0][key])
+            change_sum = 0
+            out_probability_for_room = 0
+            if sum(data_by_key) == 0:
+                out_probability_for_room = 0
+            else:
+                for i in range(len(data_by_key) - 1):
+                    change = int(data_by_key[i]) - int(data_by_key[i + 1])
+                    if change > 0:
+                        change_sum += change
+                out_probability_for_room = change_sum / sum(data_by_key)
+            
             # The probability of going to other rooms 
-            room_in_out_info[index[key]] = 1 - get_out_probability_for_room(data_partial[0], key)
+            room_in_out_info[index[key]] = 1 - out_probability_for_room
             output[key+data_partial[1]] = room_in_out_info
 
     out_csv = pd.DataFrame(output)
