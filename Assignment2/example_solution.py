@@ -1,13 +1,17 @@
 '''
 COMP9418 Assignment 2
 This file is the example code to show how the assignment will be tested.
+
+Name: Dezhao Chen           zID: z5302273
+
+Name: Ziqiao Ringgold Lin   zID: z5324329
 '''
 
 # Make division default to floating-point, saving confusion
 from __future__ import division
 from __future__ import print_function
 
-# Allowed libraries
+# Allowed libraries 
 import numpy as np
 import pandas as pd
 import scipy as sp
@@ -26,6 +30,10 @@ import sys
 import os
 import datetime
 import sklearn
+import ast
+import re
+import pickle
+import json
 from get_trans_matrix import outcomeSpace
 
 ###################################

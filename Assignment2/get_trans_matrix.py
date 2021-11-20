@@ -81,25 +81,30 @@ if __name__ == "__main__":
                 data_next = data_partial[0].iloc[i+1]
                 
                 # Here it indicates that someone has left this rooms
-                if int(data_next[key]) < int(data_now[key]):
-                    diff = int(data_now[key]) - int(data_next[key])
-                    
+                diff = int(data_now[key]) - int(data_next[key])
+                if diff > 0:
                     # Get different rooms change data
                     rooms_people_diffs = data_next[outcomeSpace.keys()] - data_now[outcomeSpace.keys()]
                     rooms_people_diffs = dict(rooms_people_diffs)
-                    rooms_people_diffs = {k: v for k, v in sorted(rooms_people_diffs.items(), key=lambda item: item[1], reverse=True)}
+                    rooms_people_diffs = {
+                        k: v for k, v in sorted(rooms_people_diffs.items(), key=lambda item: item[1], reverse=True)
+                    }
                     
                     for room in rooms_people_diffs.keys():
                         if rooms_people_diffs[room] >= diff:
+                            # this part makes sure that the room with the most increase will be updated first
                             room_in_out_info[index[room]] += diff
                             break
                         else:
                             if rooms_people_diffs[room] > 0:
                                 room_in_out_info[index[room]] += rooms_people_diffs[room]
                                 diff -= rooms_people_diffs[room]
+            
             key_data = list(data_partial[0][key])
             if sum(key_data) != 0:
                 room_in_out_info = [x/sum(key_data) for x in room_in_out_info]
+            
+            # The probability of going to other rooms 
             room_in_out_info[index[key]] = 1 - get_out_probability_for_room(data_partial[0], key)
             output[key+data_partial[1]] = room_in_out_info
 
