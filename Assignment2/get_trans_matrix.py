@@ -50,10 +50,9 @@ outcome_graph = {'r1': ['r2', 'r3', 'r4', 'r7'],
 
 if __name__ == "__main__":
     index = {}
-    start = 0
-    for key in outcome_graph.keys():
-        index[key] = start
-        start+=1
+    print(list(outcome_graph.keys()))
+    for i in range(len(outcome_graph.keys())):
+        index[list(outcome_graph.keys())[i]] = i
 
     data = pd.read_csv('data.csv')
     output = {}
