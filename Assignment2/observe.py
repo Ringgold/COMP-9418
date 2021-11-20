@@ -13,7 +13,7 @@ def room_sensor(sensor, room):
     nomotion = data[sensor].value_counts()["no motion"]
     tp = ((data[sensor] == "motion") & (data[room] != 0)).value_counts()[True]
     fn = ((data[sensor] == "no motion") & (data[room] != 0)).value_counts()[True]
-    print('TP of', sensor, ':', tp / motion)
+    print('TP for', sensor, ':', tp / motion)
     print('FN for', sensor, ':', fn / nomotion)
     print()
 
