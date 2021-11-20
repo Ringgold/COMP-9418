@@ -35,9 +35,6 @@ import re
 import pickle
 import json
 
-# Require the output graph used in transition matrix file
-from get_trans_matrix import output_graph
-
 ###################################
 # Code stub
 #
@@ -58,8 +55,14 @@ state = np.array(state)
 index_r = {}
 index_l = {}
 start = 0
-for key in output_graph.keys():
-    index_r[key] = start
+room_list = [
+    'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 
+    'r11', 'r12', 'r13', 'r14', 'r15', 'r16', 'r17', 'r18', 'r19', 'r20', 
+    'r21', 'r22', 'r23', 'r24', 'r25', 'r26', 'r27', 'r28', 'r29', 'r30', 
+    'r31', 'r32', 'r33', 'r34', 'r35', 'c1', 'c2', 'c3', 'c4', 'o1', 'outside'
+]
+for r in room_list:
+    index_r[r] = start
     if start < 35:
         index_l['lights' + str(start + 1)] = start
     start += 1
