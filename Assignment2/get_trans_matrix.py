@@ -1,8 +1,7 @@
 import pandas as pd
-import numpy as np
 
-# The output graph is generated with a BFS depth of 2
-output_graph = {'r1': ['r2', 'r3', 'r4', 'r7'],
+# The outcome graph is generated with a BFS depth of 2
+outcome_graph = {'r1': ['r2', 'r3', 'r4', 'r7'],
                 'r2': ['r1', 'r4', 'r3', 'r8'],
                 'r3': ['r1', 'r7', 'r2', 'c1'],
                 'r4': ['r2', 'r8', 'r9', 'r1'],
@@ -52,7 +51,7 @@ output_graph = {'r1': ['r2', 'r3', 'r4', 'r7'],
 if __name__ == "__main__":
     index = {}
     start = 0
-    for key in output_graph.keys():
+    for key in outcome_graph.keys():
         index[key] = start
         start+=1
 
@@ -62,8 +61,8 @@ if __name__ == "__main__":
     data_partial_info = [(data[0:2279], 't1'), (data[2279:], 't2')]
     
     for data_partial in data_partial_info:
-        for key in output_graph.keys():
-            room_in_out_info = [0] * len(output_graph.keys())
+        for key in outcome_graph.keys():
+            room_in_out_info = [0] * len(outcome_graph.keys())
             #count the possiblity of moving to other rooms
             for i in range(len(data_partial[0])-1):
                 data_now = data_partial[0].iloc[i]
@@ -73,7 +72,7 @@ if __name__ == "__main__":
                 diff = int(data_now[key]) - int(data_next[key])
                 if diff > 0:
                     # Get different rooms change data
-                    rooms_people_diffs = data_next[output_graph.keys()] - data_now[output_graph.keys()]
+                    rooms_people_diffs = data_next[outcome_graph.keys()] - data_now[outcome_graph.keys()]
                     rooms_people_diffs = dict(rooms_people_diffs)
                     rooms_people_diffs = {
                         k: v for k, v in sorted(rooms_people_diffs.items(), key=lambda item: item[1], reverse=True)
