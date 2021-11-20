@@ -55,19 +55,17 @@ for key in outcomeSpace.keys():
     start += 1
 
 params = pd.read_csv('tran_matrix.csv')
-# train_matrix stores five time period of markov transition matrix.
+
+# Initialize tran_matrix
 tran_matrix = {}
 tran_matrix['s1'] = []
-# tran_matrix['s2'] = []
-# tran_matrix['s3'] = []
+tran_matrix['s2'] = []
 
 for r in params:
     if r[-2:] == 's1':
         tran_matrix['s1'].append(list(params[r]))
-    # elif r[-2:] == 's2':
-    #     tran_matrix['s2'].append(list(params[r]))
-    # elif r[-2:] == 's3':
-    #     tran_matrix['s3'].append(list(params[r]))
+    elif r[-2:] == 's2':
+        tran_matrix['s2'].append(list(params[r]))
 
 for l in tran_matrix.keys():
     tran_matrix[l] = np.array(tran_matrix[l])
@@ -81,16 +79,13 @@ def get_action(sensor_data):
     global index_l
     global th
 
-    state = state @ tran_matrix['s1']
     # different time use different transition matrix
-    # if int(sensor_data['time'].hour) == 8 and int(sensor_data['time'].minute) < 5:
-    #     state = state @ tran_matrix['s1']
-    # elif int(sensor_data['time'].hour) < 17:
-    #     state = state @ tran_matrix['s2']
-    # elif int(sensor_data['time'].hour) == 17 and int(sensor_data['time'].minute) < 30:
-    #     state = state @ tran_matrix['s2']
-    # else:
-    #     state = state @ tran_matrix['s3']
+    if int(sensor_data['time'].hour) < 17:
+        state = state @ tran_matrix['s1']
+    elif int(sensor_data['time'].hour) == 17 and int(sensor_data['time'].minute) < 30:
+        state = state @ tran_matrix['s1']
+    else:
+        state = state @ tran_matrix['s2']
 
     # adjustment for values of reliable sensors
     sensor_list = [["reliable_sensor1", "r16", 0.963, 0.009],

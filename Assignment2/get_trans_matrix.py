@@ -48,8 +48,7 @@ outcomeSpace = {'r1': ['r2', 'r3', 'r4', 'r7'],
                 'outside': ['r12', 'r22']
                 }
 
-# function that counts the possiblity of tranfering out from the tar.
-def count_tran(data, room):
+def get_out_probability_for_room(data, room):
     d = list(data[room])
     change_sum = 0
     if sum(d) == 0:
@@ -59,7 +58,7 @@ def count_tran(data, room):
         if change > 0:
             change_sum += change
     return change_sum / sum(d)
-    
+
 if __name__ == "__main__":
     #index is the dictionary, key is the space and value is the corresponding index number.
     index = {}
@@ -70,37 +69,39 @@ if __name__ == "__main__":
 
     data = pd.read_csv('data.csv')
     output = {}
-    for key in outcomeSpace.keys():
-        #the transaction rate of the specific space. Inialize it to be all 0.
-        tran = [0]*41
-        #count the possiblity of moving to other rooms
-        for i in range(len(data)-1):
-            t1_d = data.iloc[i]
-            t2_d = data.iloc[i+1]
-            
-            # Here it indicates that someone has left this rooms
-            if int(t2_d[key]) < int(t1_d[key]):
-                diff = int(t1_d[key]) - int(t2_d[key])
+    
+    data_partial_info = [(data[0:2279], '_s1'), (data[2279:], '_s2')]
+    
+    for data_partial in data_partial_info:
+        for key in outcomeSpace.keys():
+            room_in_out_info = [0] * len(outcomeSpace.keys())
+            #count the possiblity of moving to other rooms
+            for i in range(len(data_partial[0])-1):
+                data_now = data_partial[0].iloc[i]
+                data_next = data_partial[0].iloc[i+1]
                 
-                # Get different rooms change data
-                rooms_people_diffs = t2_d[outcomeSpace.keys()] - t1_d[outcomeSpace.keys()]
-                rooms_people_diffs = dict(rooms_people_diffs)
-                rooms_people_diffs = {k: v for k, v in sorted(rooms_people_diffs.items(), key=lambda item: item[1], reverse=True)}
-                
-                for mov in rooms_people_diffs.keys():
-                    if rooms_people_diffs[mov] >= diff:
-                        tran[index[mov]] += diff
-                        break
-                    else:
-                        if rooms_people_diffs[mov] > 0:
-                            tran[index[mov]] += rooms_people_diffs[mov]
-                            diff -= rooms_people_diffs[mov]
-        d1 = list(data[key])
-        if sum(d1) != 0:
-            tran = [x/sum(d1) for x in tran]
-        tran[index[key]] = 1 - count_tran(data, key)
-        output[key+'_s1'] = tran
+                # Here it indicates that someone has left this rooms
+                if int(data_next[key]) < int(data_now[key]):
+                    diff = int(data_now[key]) - int(data_next[key])
+                    
+                    # Get different rooms change data
+                    rooms_people_diffs = data_next[outcomeSpace.keys()] - data_now[outcomeSpace.keys()]
+                    rooms_people_diffs = dict(rooms_people_diffs)
+                    rooms_people_diffs = {k: v for k, v in sorted(rooms_people_diffs.items(), key=lambda item: item[1], reverse=True)}
+                    
+                    for room in rooms_people_diffs.keys():
+                        if rooms_people_diffs[room] >= diff:
+                            room_in_out_info[index[room]] += diff
+                            break
+                        else:
+                            if rooms_people_diffs[room] > 0:
+                                room_in_out_info[index[room]] += rooms_people_diffs[room]
+                                diff -= rooms_people_diffs[room]
+            key_data = list(data_partial[0][key])
+            if sum(key_data) != 0:
+                room_in_out_info = [x/sum(key_data) for x in room_in_out_info]
+            room_in_out_info[index[key]] = 1 - get_out_probability_for_room(data_partial[0], key)
+            output[key+data_partial[1]] = room_in_out_info
 
-    #output to csv file.
     out_csv = pd.DataFrame(output)
     out_csv.to_csv('tran_matrix.csv',index=False)
