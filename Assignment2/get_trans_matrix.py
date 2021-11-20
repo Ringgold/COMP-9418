@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 
@@ -61,7 +60,6 @@ def count_tran(data, room):
             change_sum += change
     return change_sum / sum(d)
     
-
 if __name__ == "__main__":
     #index is the dictionary, key is the space and value is the corresponding index number.
     index = {}
@@ -72,8 +70,6 @@ if __name__ == "__main__":
 
     data = pd.read_csv('data.csv')
     output = {}
-
-    #All time period
     for key in outcomeSpace.keys():
         #the transaction rate of the specific space. Inialize it to be all 0.
         tran = [0]*41
@@ -82,31 +78,26 @@ if __name__ == "__main__":
             t1_d = data.iloc[i]
             t2_d = data.iloc[i+1]
             
+            # Here it indicates that someone has left this rooms
             if int(t2_d[key]) < int(t1_d[key]):
-                # Here it indicates that someone has left this room
                 diff = int(t1_d[key]) - int(t2_d[key])
                 
                 # Get different rooms change data
                 rooms_people_diffs = t2_d[outcomeSpace.keys()] - t1_d[outcomeSpace.keys()]
                 rooms_people_diffs = dict(rooms_people_diffs)
                 rooms_people_diffs = {k: v for k, v in sorted(rooms_people_diffs.items(), key=lambda item: item[1], reverse=True)}
-                # print(rooms_people_diffs.keys())
                 
                 for mov in rooms_people_diffs.keys():
-                    t1_dm = t1_d[mov]
-                    t2_dm = t2_d[mov]
-                    diff_m = int(t2_dm)-int(t1_dm)
-                    if diff_m >= diff:
+                    if rooms_people_diffs[mov] >= diff:
                         tran[index[mov]] += diff
                         break
                     else:
-                        if diff_m >0:
-                            tran[index[mov]] += diff_m
-                            diff -= diff_m
+                        if rooms_people_diffs[mov] > 0:
+                            tran[index[mov]] += rooms_people_diffs[mov]
+                            diff -= rooms_people_diffs[mov]
         d1 = list(data[key])
-        d1 = np.array(d1)
-        if d1.sum() != 0:
-            tran[:] = [x/d1.sum() for x in tran]
+        if sum(d1) != 0:
+            tran = [x/sum(d1) for x in tran]
         tran[index[key]] = 1 - count_tran(data, key)
         output[key+'_s1'] = tran
 
