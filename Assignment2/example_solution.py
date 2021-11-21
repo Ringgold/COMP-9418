@@ -42,27 +42,20 @@ import json
 # and that function must take sensor_data as an argument, and return an actions_dict
 #
 
-# th is the threshold, every 15 secs if the number of people above the th, then the light turns on
-th = 0.20
-
-# state is the number of people in each space
 state = [0] * 40
 state.append(20)
 state = np.array(state)
-
-# dict room store the relationship between list position in state and the name of the room
 room = {}
-
 room_list = [
     'r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r8', 'r9', 'r10', 
     'r11', 'r12', 'r13', 'r14', 'r15', 'r16', 'r17', 'r18', 'r19', 'r20', 
     'r21', 'r22', 'r23', 'r24', 'r25', 'r26', 'r27', 'r28', 'r29', 'r30', 
     'r31', 'r32', 'r33', 'r34', 'r35', 'c1', 'c2', 'c3', 'c4', 'o1', 'outside'
 ]
+threshold = 0.20
 
 for i in range(len(room_list)):
     room[room_list[i]] = i
-
 
 tran_matrix_data = pd.read_csv('tran_matrix.csv')
 tran_matrix = {'t1': [], 't2': []}
@@ -81,18 +74,17 @@ def get_action(sensor_data):
     global state
     global tran_matrix
     global room
-    global th
-
-    # multiple the state with transition matrix to get the next state
-    # before adjust with sensors and robots
-    if int(sensor_data['time'].hour) < 17:
-        state = state @ tran_matrix['t1']
-    elif int(sensor_data['time'].hour) == 17 and int(sensor_data['time'].minute) < 30:
-        state = state @ tran_matrix['t1']
-    else:
+    global threshold
+    
+    start_time = datetime.time(hour=17,minute=30)
+    end_time = datetime.time(18,0)
+    
+    if sensor_data['time'] >= start_time and sensor_data['time'] <= end_time:
         state = state @ tran_matrix['t2']
+    else:
+        state = state @ tran_matrix['t1']
 
-    # adjustment with room sensors
+    # room sensors
     sensor_list = [["reliable_sensor1", "r16", 0.963, 0.009],
                    ["reliable_sensor2", "r5", 0.706, 0.001],
                    ["reliable_sensor3", "r25", 0.902, 0.014],
@@ -104,12 +96,12 @@ def get_action(sensor_data):
                    ]
 
     for slist in sensor_list:
-        if sensor_data[slist[0]] == "motion" and state[room[slist[1]]] < th:
+        if sensor_data[slist[0]] == "motion" and state[room[slist[1]]] < threshold:
             state[room[slist[1]]] = slist[2]
-        if sensor_data[slist[0]] == "no motion" and state[room[slist[1]]] > th:
+        if sensor_data[slist[0]] == "no motion" and state[room[slist[1]]] > threshold:
             state[room[slist[1]]] = slist[3]
 
-    # adjustment with door sensors
+    # door sensors
     door_list = [["door_sensor1", "r8", "r9", 0.390, 0.609],
                  ["door_sensor2", "c1", "c2", 0.940, 0.703],
                  ["door_sensor3", "r26", "r27", 0.514, 0.649],
@@ -117,12 +109,12 @@ def get_action(sensor_data):
                  ]
     for dlist in door_list:
         if sensor_data[dlist[0]] and int(sensor_data[dlist[0]]) > 0:
-            if state[room[dlist[1]]] < th:
+            if state[room[dlist[1]]] < threshold:
                 state[room[dlist[1]]] = dlist[3]
-            if state[room[dlist[2]]] < th:
+            if state[room[dlist[2]]] < threshold:
                 state[room[dlist[2]]] = dlist[4]
 
-    # robot
+    # robot sensors
     for r in ['robot1', 'robot2']:
         if sensor_data[r]:
             position = sensor_data[r].split(',')[0].strip('(').strip("'")
@@ -130,13 +122,11 @@ def get_action(sensor_data):
             state[room[position]] = int(people)
 
     # generate the actions based on states
-    # if the number of people in a room is more than the threshold
-    # then turn on the light
     actions_dict = {}
 
     for r in range(0, 35):
         light = "lights" + str(r+1)
-        if state[r] > th:
+        if state[r] > threshold:
             actions_dict[light] = 'on'
         else:
             actions_dict[light] = 'off'

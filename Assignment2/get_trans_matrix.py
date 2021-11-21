@@ -50,7 +50,6 @@ outcome_graph = {'r1': ['r2', 'r3', 'r4', 'r7'],
 
 if __name__ == "__main__":
     index = {}
-    print(list(outcome_graph.keys()))
     for i in range(len(outcome_graph.keys())):
         index[list(outcome_graph.keys())[i]] = i
 
@@ -109,5 +108,5 @@ if __name__ == "__main__":
             room_in_out_info[index[key]] = 1 - out_probability_for_room
             output[key+data_partial[1]] = room_in_out_info
 
-    out_csv = pd.DataFrame(output)
-    out_csv.to_csv('tran_matrix.csv',index=False)
+    output_file = pd.DataFrame(output)
+    output_file.to_csv('tran_matrix.csv',index=False)
