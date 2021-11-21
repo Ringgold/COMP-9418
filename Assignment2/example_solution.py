@@ -66,8 +66,9 @@ for line in tran_matrix_data:
     elif 't2' in line:
         tran_matrix['t2'].append(list(tran_matrix_data[line]))
 
-for t in tran_matrix.keys():
-    tran_matrix[t] = np.array(tran_matrix[t])
+for k, v in tran_matrix.items():
+    tran_matrix[k] = np.array(v)
+
 
 def get_action(sensor_data):
     # declare these staff as global so they can be a part of the function
